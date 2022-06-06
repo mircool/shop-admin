@@ -68,10 +68,16 @@
   </el-row>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import {ref, reactive} from "vue";
+import {useRouter} from 'vue-router'
+import { useCookies } from '@vueuse/integrations/useCookies'
 
+import {ElNotification} from 'element-plus'
 import {login} from '~/api/manager'
+
+const router=useRouter()
+const cookie=useCookies()
 
 // do not use same name with ref
 const form = reactive({
@@ -101,18 +107,27 @@ const formRef = ref(null);
 const onSubmit = () => {
   formRef.value.validate((valid) => {
     if (!valid) {
-      console.log("error submit!");
-      return false;
+      console.log('验证错误')
+      return false
     }
-    login(form.username, from.password)
-        .then((result) => {
-          console.log(result)
-
+    login(form.username, form.password)
+        .then(result => {
+          console.log(result.data.data)
+          ElNotification({
+            message: '登录成功',
+            type: 'success',
+            duration: 3000
+          })
+          cookie.set('admin-toke',result.data.data.token)
+          router.push('/')
         })
-        .catch(error => {
-          console.log(error)
+        .catch(err => {
+          ElNotification({
+            message: err.response.data.msg,
+            type: 'error',
+            duration: 3000
+          })
         })
-
   });
 };
 </script>
