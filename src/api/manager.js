@@ -1,7 +1,13 @@
 import axios from '~/axios';
 
-export function login(username, password) {
+function login(username, password) {
     return axios.post('/admin/login', {
         username, password
     })
 }
+
+function getinfo() {
+    return axios.post('/admin/getinfo')
+}
+
+export {login, getinfo}
