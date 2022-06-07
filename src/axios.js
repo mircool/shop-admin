@@ -33,6 +33,7 @@ service.interceptors.response.use(function (response) {
         type: 'error',
         duration: 3000
     })
+
     return Promise.reject(error);
 });
 

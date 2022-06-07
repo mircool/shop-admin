@@ -59,6 +59,7 @@
               round
               color="#6366f1"
               @click="onSubmit"
+              :loading="loading"
           >登录
           </el-button
           >
@@ -103,15 +104,19 @@ const rules = {
 };
 
 const formRef = ref(null);
+const loading = ref(false)
 
 const onSubmit = () => {
+
   formRef.value.validate((valid) => {
     if (!valid) {
       console.log('验证错误')
       return false
     }
+    loading.value = true
     login(form.username, form.password)
         .then(result => {
+          loading.value = false
           ElNotification({
             message: '登录成功',
             type: 'success',
@@ -123,6 +128,9 @@ const onSubmit = () => {
             console.log(res)
           })
 
+        })
+        .finally(() => {
+          loading.value = false
         })
   });
 };
