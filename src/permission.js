@@ -1,10 +1,11 @@
 import router from './router';
 import {useCookies} from '@vueuse/integrations/useCookies'
 import {ElNotification} from 'element-plus'
+import store from "./store";
 
 const cookies = useCookies();
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     const token = cookies.get('admin-token');
 
     if (!token && to.path !== '/login') {
@@ -19,6 +20,10 @@ router.beforeEach((to, from, next) => {
             message: '你已经登录'
         })
         next({path: from.path ? from.path : '/'});
+    }
+
+    if (token) {
+        await store.dispatch('getinfo')
     }
 
     next();

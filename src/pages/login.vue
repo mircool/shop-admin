@@ -70,14 +70,13 @@
 </template>
 
 <script setup>
-import {ref, reactive} from "vue";
+import {ref, reactive, onMounted, onBeforeMount} from "vue";
 import {useRouter} from 'vue-router'
 import {useStore} from 'vuex'
 import {useCookies} from '@vueuse/integrations/useCookies'
 
 
 import {ElNotification} from 'element-plus'
-import {login, getinfo} from '~/api/manager'
 
 const router = useRouter()
 const cookie = useCookies()
@@ -117,25 +116,34 @@ const onSubmit = () => {
       return false
     }
     loading.value = true
-    login(form.username, form.password)
-        .then(result => {
-          loading.value = false
-          ElNotification({
-            message: '登录成功',
-            type: 'success',
-            duration: 3000
-          })
-          cookie.set('admin-token', result.token)
-
-          getinfo().then(res => {
-            store.commit('SET_USERINFO', res)
-          })
-
-          router.push('/')
-        })
-        .finally(() => {
-          loading.value = false
-        })
+    store.dispatch('login', form).then(res => {
+      ElNotification({
+        message: '登录成功',
+        type: 'success',
+        duration: 3000
+      })
+      router.push('/')
+    }).finally(() => {
+      loading.value = false
+    })
   });
 };
+
+
+onMounted(() => {
+  //添加键盘监听事件
+  window.addEventListener('keydown', (e) => {
+    if (e.keyCode === 13) {
+      onSubmit()
+    }
+  })
+})
+
+onBeforeMount(() => {
+  window.removeEventListener('keydown', (e) => {
+    if (e.keyCode === 13) {
+      onSubmit()
+    }
+  })
+})
 </script>
