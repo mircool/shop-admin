@@ -72,13 +72,16 @@
 <script setup>
 import {ref, reactive} from "vue";
 import {useRouter} from 'vue-router'
+import {useStore} from 'vuex'
 import {useCookies} from '@vueuse/integrations/useCookies'
+
 
 import {ElNotification} from 'element-plus'
 import {login, getinfo} from '~/api/manager'
 
 const router = useRouter()
 const cookie = useCookies()
+const store = useStore()
 
 // do not use same name with ref
 const form = reactive({
@@ -125,9 +128,10 @@ const onSubmit = () => {
           cookie.set('admin-token', result.token)
 
           getinfo().then(res => {
-            console.log(res)
+            store.commit('SET_USERINFO', res)
           })
 
+          router.push('/')
         })
         .finally(() => {
           loading.value = false
